@@ -1,6 +1,6 @@
 <?php
 
-include 'header.php' ;
+include 'layout/header.php' ;
  
  if (isset($_POST['submit'])) {
    
@@ -176,5 +176,5 @@ include 'header.php' ;
 
    
        
-    <?php include 'footer.php' ?>
+    <?php include 'layout/footer.php' ?>
 </html>

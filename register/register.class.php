@@ -13,7 +13,7 @@ class  RegisterUser {
     public $error;
 
     public $success;
-    private $storage = "user.json";
+    private $storage = "../user.json";
     private $stored_users;
     private $new_user;
 
@@ -43,7 +43,7 @@ class  RegisterUser {
         if($this->checkFieldValues()   && !$this->emailexists()) {
             session_start();
             $_SESSION['email'] = $this->email;
-            $rootFolder = 'assets/user_folders/';
+            $rootFolder = '../assets/user_folders/';
 
             
             $userFolder = $rootFolder . $_SESSION['email'];
@@ -60,7 +60,7 @@ class  RegisterUser {
                 echo "User folder already exists!";
             }
             $this->insertuser();
-            header("Location: login.php");
+            header("Location: ../login/login.php");
         } else {
              $this->error;
         }
@@ -77,17 +77,7 @@ class  RegisterUser {
         }
     }
 
-    // check condition
-
-    // private function checkConditions() {
-    //     if(!isset($this->checkbox)){
-    //         $this->error = "Please accept the terms and conditions";
-    //         return false;
-    //     } else {
-    //         return true;
-        
-    //     }
-    // }
+  
 
     // check if the user already exists
     private function emailexists() {

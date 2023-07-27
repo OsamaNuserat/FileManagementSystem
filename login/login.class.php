@@ -6,7 +6,7 @@ class LoginUser {
     private $stored_users;
     public $error;
     public $success;
-    private $storage = "user.json";
+    private $storage = "../user.json";
 
     public function __construct ($username,$password) {
         $this->username = $username;
@@ -25,7 +25,7 @@ class LoginUser {
                 session_start();
                 $_SESSION['user'] = $this->username;
                 
-                header("Location: ./index.php");
+                header("Location: ../index.php");
                 exit();
             } else {
                 $this->error = "Invalid username or password";
