@@ -1,18 +1,21 @@
 <?php
 
+
 include 'layout/header.php' ;
- 
- if (isset($_POST['submit'])) {
+
+// uploading a file
+if (isset($_POST['submit'])) {
    
  $file = $_FILES['file'];
- global $file;
+ print_r($file);
+
   
   $fileName = $file['name'];
   $fileTmpName = $file['tmp_name'];
   $fileSize =$file['size'];
   $fileError = $file['error'];
   $fileType = $file['type'];
-  print_r($fileType);
+
 
   $fileExt = explode('.', $fileName);
   $fileActualExt = strtolower(end($fileExt));
@@ -38,7 +41,56 @@ include 'layout/header.php' ;
   } else {
     echo "You cannot upload files of this type!";
   }
+
+  // if(isset($_GET['delete'])) {
+  //   // get the file and then make the path and unlink it
+  //   $file = $_FILES['file'];
+  //   echo
+  //   $fileName = $file['name'];
+    
+  //   $fileDestination = 'assets/user_folders'.'/'.$_SESSION['email'].'/'.$fileName;
+  //   unlink($fileDestination);
+  //   header("Location: index.php?success");
+  // }
+
 }
+
+
+
+// Creating a Folder
+if (isset($_POST["create"])) {
+   
+  $folderName = $_POST["folder_name"];
+
+  
+  $folderName = preg_replace('/[^A-Za-z0-9\-]/', '_', $folderName);
+
+  
+  $baseDirectory = 'assets/user_folders'.'/'.$_SESSION['email'].'/';
+
+  
+  if (!file_exists($baseDirectory)) {
+      mkdir($baseDirectory, 0777, true);
+  }
+
+  
+  $folderPath = $baseDirectory . $folderName;
+
+  
+  if (file_exists($folderPath)) {
+      echo "Folder already exists.";
+  } else {
+      
+      if (mkdir($folderPath, 0777)) {
+          header("Location: index.php?foldercreated");
+      } else {
+          header("Location: index.php?exists");
+      }
+  }
+}
+
+
+
 
 ?>
 
@@ -97,8 +149,8 @@ include 'layout/header.php' ;
      
       <div class="modal-body">
       <form action="" method="POST" enctype="multipart/form-data">
-        <label for="text">Create Folder</label> <br>
-        <input type="text" name="folder" class="form-control"> <br>
+        <label for="folder_name">Create Folder</label> <br>
+        <input type="text" name="folder_name" class="form-control"> <br>
         <input type="submit" class="btn btn-primary" name="create" value="Create">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
       </div>
@@ -130,17 +182,22 @@ include 'layout/header.php' ;
 
       <?php 
       
-      $dir = "assets/user_folders".'/'.$_SESSION['email'];
-      $files = scandir($dir);
-      $files = array_diff(scandir($dir), array('..', '.'));
+      $dir = "assets/user_folders".'/'.$_SESSION['email'].'/';
+      // $files = scandir($dir);
+      // $files = array_diff(scandir($dir), array('..', '.'));
+      $files = glob($dir.'*.{jpg,jpeg,png,pdf}', GLOB_BRACE);
+      $files = array_map('basename', $files);
       
- 
-    foreach($files as $file) {  ?>
-     
+
+    foreach($files as $file) { ?>
+    
+      
       <tr> 
 
       <td>
-      <?php echo $file ?>
+      <?php $fileName = explode('.' , $file);
+            echo $fileName[0];
+      ?>
       </td>
 
       <td>
@@ -156,17 +213,65 @@ include 'layout/header.php' ;
       </td>
 
       <td>
-      <a href="#"><i class='fa-regular fa-eye text-success border p-1 '></i></a> 
-      <a href="#"><i class='fa-regular fa-trash-can border text-danger p-1'></i></a> 
+      <i class='fa-regular fa-eye text-success border p-1 ' ></i> 
+      <a href="?delete"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
       </td>
 
       <td>
       <input class='form-check-input otherCheckbox' type='checkbox' value='' id='defaultCheck1'>
       </td>
        </tr> 
+
+       
+
      
-      
+   
     <?php } ?>
+    
+   
+
+    <!-- looping on the folders to upload them inside the table -->
+   <?php  
+   
+    $dir = "assets/user_folders".'/'.$_SESSION['email'].'/';
+    $folders = glob($dir.'*', GLOB_ONLYDIR);
+    $folders = array_map('basename', $folders);
+
+
+    foreach($folders as $folder) { ?>
+
+      <tr>
+        
+        <td>
+        <i class="fa-regular fa-folder-closed"></i>
+          <?php echo $folder ?>
+        </td>
+
+        <td>Folder</td>
+
+        <td> 
+      <?php  $dateAdded = date("d-m-Y g:i A");
+      echo $dateAdded;
+      ?>
+      </td>
+
+      <td>
+      <i class='fa-regular fa-eye text-success border p-1 ' ></i> 
+      <a href="?delete"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
+      </td>
+
+      <td>
+      <input class='form-check-input otherCheckbox' type='checkbox' value='' id='defaultCheck1'>
+      </td>
+      </tr>
+
+
+   <?php } ?>
+
+
+    
+
+      
     
 
   </tbody>

@@ -3,12 +3,12 @@
 
 session_start();
 if(!isset($_SESSION['user'])) {
-    header("Location: ../login/login.php");
+    header("Location: login/login.php");
     exit();
 }
 if(isset($_GET['logout'])) {
     unset($_SESSION['user']);
-    header("Location: ../login/login.php");
+    header("Location: login/login.php");
     exit();
 }
 
@@ -44,8 +44,8 @@ if(isset($_GET['logout'])) {
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
       <li class="nav-item d-flex justify-content-end">
-          <a href="?logout" class="text-white "><i class="fa-solid fa-arrow-right-from-bracket mx-1">Log out</i></a>
-          <!-- <a class="nav-link text-white"  href="?logout">Logout</a> -->
+          <a href="?logout"  class="text-white "><i class="fa-solid fa-arrow-right-from-bracket mx-1">Log out</i></a>
+          
         </li>
 
        
