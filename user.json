@@ -1,1 +1,12 @@
-[{"username":"osama","email":"osama@gmail.com","password":"$2y$10$GT2L85940HnN0eaLh8vPwesw9tDDWnpLin.o5Wmb7L06hdcNF4PSa"},{"username":"yanal","email":"yanal@gmail.com","password":"$2y$10$tyR6DxoGeR.oCXo6MbtqqeDX7av1joFEQE5AFUeLfNsbFYVl2Kluq"},{"username":"izz","email":"izz@gmail.com","password":"$2y$10$7L\/kPHwJxHN3k6TXC.nBWe1HNqEXJM93jBg..fGgOHvRL7NQp.sj."}]
+[
+  {
+    "username": "osama",
+    "email": "osama@gmail.com",
+    "password": "$2y$10$/NwrmcOweE8737MSm0JTBuAP0P.3s.nswLI0JVTy5KNgpYkqlNi7q"
+  },
+  {
+    "username": "maen",
+    "email": "maen@gmail.com",
+    "password": "$2y$10$tL3K1LF/nYVED.KjkFv9XeTnzjn4.9MBUvOlR6afZfDFUnXrlHr/y"
+  }
+]

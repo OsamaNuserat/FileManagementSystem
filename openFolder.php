@@ -1,7 +1,4 @@
 <?php
-
-
-
 include 'layout/header.php' ;
 
 // uploading a file
@@ -9,6 +6,7 @@ if (isset($_POST['submit'])) {
    
  $file = $_FILES['file'];
 
+  
   $fileName = $file['name'];
   $fileTmpName = $file['tmp_name'];
   $fileSize =$file['size'];
@@ -26,11 +24,9 @@ if (isset($_POST['submit'])) {
   if(in_array($fileActualExt,$allowed)) {
     if($fileError === 0) {
       if($fileSize < 20971520) {
-        $fileDestination = 'assets/user_folders'.'/'.$_SESSION['email'].'/'.$fileName;
+        $fileDestination = 'assets/user_folders'.'/'.$_SESSION['email'].'/'. $_SERVER['QUERY_STRING'] .'/'.$fileName;
         move_uploaded_file($fileTmpName,$fileDestination);
-        header("Location: index.php?uploadsuccess");
-        
-       
+ 
       } else {
         echo "Your file is too big!";
       }
@@ -49,48 +45,22 @@ if (isset($_POST['submit'])) {
 
 // Creating a Folder
 if (isset($_POST["create"])) {
-   
+
+
   $folderName = $_POST["folder_name"];
-
-  
   $folderName = preg_replace('/[^A-Za-z0-9\-]/', '_', $folderName);
-
-  
-  $baseDirectory = 'assets/user_folders'.'/'.$_SESSION['email'].'/';
-
+  $baseDirectory = 'assets/user_folders'.'/'.$_SESSION['email'].'/' .  $_SERVER['QUERY_STRING'].'/';
   
   if (!file_exists($baseDirectory)) {
       mkdir($baseDirectory, 0777, true);
   }
-
-  
   $folderPath = $baseDirectory . $folderName;
-
-  
   if (file_exists($folderPath)) {
-      echo "Folder already exists.";
-  } else {
-      
-      if (mkdir($folderPath, 0777)) {
-          header("Location: index.php?foldercreated");
-      } else {
-          header("Location: index.php?exists");
-      }
-  }
-
- 
-
+// echo "The folder already exists";
+} else {
+ mkdir($folderPath, 0777, true);
+  }        
 }
-
-if($_SERVER['QUERY_STRING'] == 'delete' ) {
-  
-  
-   
- }
-
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -100,10 +70,8 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
     <div class="container  d-flex justify-content-between">
    
     <div class="header-content d-flex justify-content-start mx-2">
-      <i class="fa-regular fa-folder-open  " style=" "></i>
+      <i class="fa-regular fa-folder-open" style=" "></i>
        <h1>File Manger</h1>
-     
-      
     </div>
 
     <!-- modals -->
@@ -127,9 +95,7 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
         </form>
       </div>
-      
-      
-      
+
     </div>
   </div>
 </div>
@@ -164,8 +130,8 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
     
    
 
-    <table class="table table-striped">
-        <div class="container w-50">
+    <table class="table table-striped   ">
+      
         <thead>
     <tr>
       <th scope="col">Title/Name</th>
@@ -178,14 +144,11 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
   <tbody>
 
       
-
-      <?php 
+  <?php 
       
-      $dir = "assets/user_folders".'/'.$_SESSION['email'].'/';
+      $dir = "assets/user_folders".'/'.$_SESSION['email'].'/' .  $_SERVER['QUERY_STRING'].'/';
       $files = glob($dir.'*.{jpg,jpeg,png,pdf}', GLOB_BRACE);
       $files = array_map('basename', $files);
-      
-    
 
     foreach($files as $file) { ?>
     
@@ -212,7 +175,7 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
 
       <td>
       <i class='fa-regular fa-eye text-success border p-1 ' ></i> 
-      <a href='<?php echo "?$file" ; ?>'><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
+      <a href="?delete"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
       </td>
 
       <td>
@@ -231,7 +194,7 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
     <!-- looping on the folders to upload them inside the table -->
    <?php  
    
-    $dir = "assets/user_folders".'/'.$_SESSION['email'].'/';
+    $dir = "assets/user_folders".'/'.$_SESSION['email'].'/' .  $_SERVER['QUERY_STRING'].'/';
     $folders = glob($dir.'*', GLOB_ONLYDIR);
     $folders = array_map('basename', $folders);
 
@@ -242,7 +205,7 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
         
         <td>
         <i class="fa-regular fa-folder-closed"></i>
-        <a href='<?php echo "openFolder.php?$folder" ?>'><?php echo $folder  ?></a>  
+        <a href='#'><?php echo $folder  ?></a>  
         </td>
 
         <td>Folder</td>
@@ -267,15 +230,11 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
    <?php } ?>
 
 
-    
-
-      
-    
-
   </tbody>
-        </div>
+  
   
 </table>
+<a href="index.php" class="btn btn-success">Go Back</a>
 
    
        
