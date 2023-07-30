@@ -41,6 +41,33 @@ if (isset($_POST['submit'])) {
 
 }
 
+// removing a file 
+if($_SERVER['QUERY_STRING'] == 'deletefile') {
+  $dir = "assets/user_folders".'/'.$_SESSION['email'].'/' .  $_SERVER['QUERY_STRING'].'/' ;
+  $files = glob($dir . '*.{jpg,jpeg,png,pdf}', GLOB_BRACE);
+  $files = array_map('basename', $files);
+  print_r($files);
+  
+  
+  $queryString = urldecode($_SERVER['QUERY_STRING']);
+  
+  foreach ($files as $file) {
+      
+      $decodedFileName = urldecode($file);
+  
+      if ($queryString == $decodedFileName) {
+          $filePath = $dir . $file; 
+          if (unlink($filePath)) {
+              echo "File '$decodedFileName' has been deleted successfully.";
+          } else {
+              echo "Error deleting file '$decodedFileName'.";
+          }
+          break;
+      }
+  }
+}
+
+
 
 
 // Creating a Folder
@@ -107,7 +134,7 @@ if (isset($_POST["create"])) {
   Create Folder
 </button>
 
-<!-- Modal -->
+
 <div class="modal fade" id="exampleModa2" tabindex="-1" aria-labelledby="exampleModalLabe2" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -120,6 +147,23 @@ if (isset($_POST["create"])) {
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
       </div>
       
+    </div>
+  </div>
+</div>
+
+<!-- modal 3 -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Image Viewer</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" src="" width="100%" height="100%" alt="Image">
+      </div>
     </div>
   </div>
 </div>
@@ -174,8 +218,10 @@ if (isset($_POST["create"])) {
       </td>
 
       <td>
-      <i class='fa-regular fa-eye text-success border p-1 ' ></i> 
-      <a href="?delete"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
+      <a href="#" class="view-button" data-toggle="modal" data-target="#imageModal" data-image="<?php echo $file; ?>">
+        <i class='fa-regular fa-eye text-success border p-1'></i>
+      </a> 
+      <a href="<?php echo  '&' . urlencode($file);  ?>"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
       </td>
 
       <td>
@@ -218,7 +264,7 @@ if (isset($_POST["create"])) {
 
       <td>
       <i class='fa-regular fa-eye text-success border p-1 ' ></i> 
-      <a href="?delete"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
+      <a href="?deletefolder"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
       </td>
 
       <td>
@@ -239,4 +285,13 @@ if (isset($_POST["create"])) {
    
        
     <?php include 'layout/footer.php' ?>
+
+    <script>
+      $(document).ready(function() {
+        $('.view-button').click(function() {
+          var image = $(this).data('image');
+          $('#modalImage').attr('src', 'assets/user_folders/<?php echo $_SESSION['email']; ?>/<?php echo $folder  ?>/   '+image);
+        });
+      });
+      </script>
 </html>

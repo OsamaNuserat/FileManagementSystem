@@ -82,11 +82,76 @@ if (isset($_POST["create"])) {
 
 }
 
-if($_SERVER['QUERY_STRING'] == 'delete' ) {
-  
-  
-   
- }
+
+  // delete a file
+$dir = "assets/user_folders" . '/' . $_SESSION['email'] . '/';
+$files = glob($dir . '*.{jpg,jpeg,png,pdf}', GLOB_BRACE);
+$files = array_map('basename', $files);
+
+
+$queryString = urldecode($_SERVER['QUERY_STRING']);
+
+foreach ($files as $file) {
+    
+    $decodedFileName = urldecode($file);
+
+    if ($queryString == $decodedFileName) {
+        $filePath = $dir . $file; 
+        if (unlink($filePath)) {
+            echo "File '$decodedFileName' has been deleted successfully.";
+        } else {
+            echo "Error deleting file '$decodedFileName'.";
+        }
+        break;
+    }
+}
+
+//  delete a folder
+$path = "assets/user_folders" . '/' . $_SESSION['email'] . '/';
+$folders = glob($path . '*', GLOB_ONLYDIR);
+$folders = array_map('basename', $folders);
+
+
+$queryString = urldecode($_SERVER['QUERY_STRING']);
+
+foreach ($folders as $folder) {
+    
+    $decodedFolderName = urldecode($folder);
+
+    if ($decodedFolderName == $queryString) {
+        $folderPath = $path . $folder;
+
+        $files = glob($folderPath . '/*.{jpg,jpeg,png,pdf}', GLOB_BRACE);
+        $files = array_map('basename', $files);
+
+        
+        foreach ($files as $file) {
+            $filePath = $folderPath . '/' . $file;
+            if (unlink($filePath)) {
+                //
+            } else {
+                echo "Error deleting file '$file'.";
+            }
+        }
+
+        
+        if (rmdir($folderPath)) {
+            echo "Folder '$decodedFolderName' has been deleted successfully.";
+        } else {
+            echo "Error deleting folder '$decodedFolderName'.";
+        }
+        break;
+    }
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -116,7 +181,7 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog ">
     <div class="modal-content">
       
       <div class="modal-body">
@@ -127,6 +192,8 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
         </form>
       </div>
+
+      
       
       
       
@@ -158,6 +225,23 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
   </div>
 </div>
 
+<!-- modal 3 -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Image Viewer</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" src="" width="100%" height="100%" alt="Image">
+      </div>
+    </div>
+  </div>
+</div>
+
     </div>
     </div>
    </div>
@@ -177,26 +261,24 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
   </thead>
   <tbody>
 
-      
-
       <?php 
-      
+   
       $dir = "assets/user_folders".'/'.$_SESSION['email'].'/';
       $files = glob($dir.'*.{jpg,jpeg,png,pdf}', GLOB_BRACE);
       $files = array_map('basename', $files);
       
-    
+      
 
     foreach($files as $file) { ?>
     
       
       <tr> 
-
-      <td>
-      <?php $fileName = explode('.' , $file);
-            echo $fileName[0];
-      ?>
-      </td>
+       
+          <td>
+          <?php $fileName = explode('.' , $file);
+                echo $fileName[0];
+          ?>
+          </td>
 
       <td>
         <?php $filetype = explode('.',$file);
@@ -205,14 +287,16 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
       </td>
 
       <td> 
-      <?php  $dateAdded = date("d-m-Y g:i A");
-      echo $dateAdded;
+      <?php            
+      echo date("d-m-Y g:i A");
       ?>
       </td>
 
       <td>
-      <i class='fa-regular fa-eye text-success border p-1 ' ></i> 
-      <a href='<?php echo "?$file" ; ?>'><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
+      <a href="#" class="view-button" data-toggle="modal" data-target="#imageModal" data-image="<?php echo $file; ?>">
+        <i class='fa-regular fa-eye text-success border p-1'></i>
+      </a>
+      <a href='<?php  echo "?$file"  ?>'><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
       </td>
 
       <td>
@@ -241,21 +325,21 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
       <tr>
         
         <td>
-        <i class="fa-regular fa-folder-closed"></i>
-        <a href='<?php echo "openFolder.php?$folder" ?>'><?php echo $folder  ?></a>  
+        <i class="first-td fa-regular fa-folder-closed"></i>
+        <a class="text-dark first-td" href='<?php echo "openFolder.php?$folder" ?>'><?php echo $folder  ?></a>  
         </td>
 
         <td>Folder</td>
 
         <td> 
       <?php  $dateAdded = date("d-m-Y g:i A");
-      echo $dateAdded;
+             echo $dateAdded;
       ?>
       </td>
 
       <td>
       <i class='fa-regular fa-eye text-success border p-1 ' ></i> 
-      <a href="?delete"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
+      <a href=" <?php  echo "?$folder" ?>"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
       </td>
 
       <td>
@@ -280,4 +364,12 @@ if($_SERVER['QUERY_STRING'] == 'delete' ) {
    
        
     <?php include 'layout/footer.php' ?>
+    <script>
+      $(document).ready(function() {
+        $('.view-button').click(function() {
+          var image = $(this).data('image');
+          $('#modalImage').attr('src', 'assets/user_folders/<?php echo $_SESSION['email']; ?>/'+image);
+        });
+      });
+      </script>
 </html>

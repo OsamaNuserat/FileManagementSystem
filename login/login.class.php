@@ -24,7 +24,9 @@ class LoginUser {
             if($user['username'] == $this->username && password_verify($this->password, $user['password'])) {
                 session_start();
                 $_SESSION['user'] = $this->username;
+
                 
+
                 header("Location: ../index.php");
                 exit();
             } else {
