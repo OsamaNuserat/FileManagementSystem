@@ -57,40 +57,60 @@ if (isset($_POST["create"])) {
   }
 }
 
-$url = $_SERVER['REQUEST_URI'];
-$queryString = parse_url($url, PHP_URL_QUERY);
+function deletefile() {
+  $url = $_SERVER['REQUEST_URI'];
+  $queryString = parse_url($url, PHP_URL_QUERY);
 
-if ($queryString !== null) {
-  $parts = explode('/', $queryString);
+  if ($queryString !== null) {
+      $parts = explode('/', $queryString);
 
-  if (count($parts) >= 2) {
-    $folder_name = $parts[0];
-    $loginImage = $parts[1];
+      if (count($parts) >= 2) {
+          $folder_name = $parts[0];
+          $loginImage = $parts[1];
 
-    $folder_name = urldecode($folder_name);
-    $loginImage = urldecode($loginImage);
+          $folder_name = urldecode($folder_name);
+          $loginImage = urldecode($loginImage);
 
-    $dir = "assets/user_folders" . '/' . $_SESSION['email'] . '/' . $folder_name . '/' . $loginImage;
+          $dir = "assets/user_folders" . '/' . $_SESSION['email'] . '/' . $folder_name . '/' . $loginImage;
 
-    if (file_exists($dir)) {
-      if (is_file($dir)) {
-        unlink($dir);
-        echo "The file $dir has been deleted";
-      } else {
-        echo "The path $dir is a directory, not a file.";
+          if (file_exists($dir)) {
+              if (is_file($dir)) {
+                  unlink($dir);
+                  echo "The file $dir has been deleted";
+
+                  // Update the URL without triggering a page refresh
+                  $urlParts = explode('?', $_SERVER['REQUEST_URI'], 2);
+                  
+                  $newUrl = $urlParts[0] . '?' . $folder_name;
+
+                  echo "<script>history.replaceState(null, '', '$newUrl');</script>";
+              } else {
+                if(is_dir($dir)) {
+                  rmdir($dir);
+                  echo "The folder $dir has been deleted";
+              } else {
+                  echo "The folder $dir does not exist";
+              }
+              }
+          } else {
+              echo "The file $dir does not exist";
+          }
+         
       }
-    } else {
-      echo "The file $dir does not exist";
-    }
   } else {
-   
+      echo "No query string found in the URL.";
   }
-} else {
-  echo "No query string found in the URL.";
 }
 
 
-//  delete a folder
+
+deletefile();
+
+
+
+
+
+
 
 
 ?>
@@ -226,8 +246,8 @@ if ($queryString !== null) {
           <a href="#" class="view-button" data-toggle="modal" data-target="#imageModal" data-image="<?php echo $file; ?>">
             <i class='fa-regular fa-eye text-success border p-1'></i>
           </a>
-          <button id="deleteFileButton">Delete File</button>
-          <div id="responseContainer"></div>
+          <a href=" <?php  echo $_SERVER['REQUEST_URI'] . '/' . "$file" . '/'; ?>"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
+
 
         </td>
 
@@ -271,7 +291,7 @@ if ($queryString !== null) {
 
         <td>
           <i class='fa-regular fa-eye text-success border p-1 '></i>
-          <a href="<?php  ?>"><i class='fa-regular fa-trash-can border text-danger p-1'></i> </a>
+          <a href=" <?php  echo $_SERVER['REQUEST_URI'] . '/' . "$folder" . '/'; ?>"><i class='fa-regular fa-trash-can border text-danger p-1'></i> </a>
         </td>
 
         <td>

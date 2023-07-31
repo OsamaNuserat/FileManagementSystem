@@ -15,26 +15,33 @@ class LoginUser {
         if($this->checkFieldValues()) {
 
             $this->login();
-        }
-    }
-
-    private function login () {
-
-        foreach ($this->stored_users as $user) {
-            if($user['username'] == $this->username && password_verify($this->password, $user['password'])) {
-                session_start();
-                $_SESSION['user'] = $this->username;
-
-                
-
+            if($this->login()) {
                 header("Location: ../index.php");
-                exit();
-            } else {
-                $this->error = "Invalid username or password";
             }
         }
-
+       
     }
+
+    private function login() {
+        $loginSuccess = false; // Flag to track successful login
+    
+        foreach ($this->stored_users as $user) {
+            if ($user['username'] == $this->username && password_verify($this->password, $user['password'])) {
+                session_start();
+                $_SESSION['user'] = $this->username;
+                $loginSuccess = true; // Set the flag to true for successful login
+                break; // Exit the loop as we found a match
+            }
+        }
+    
+        if ($loginSuccess) {
+            header("Location: ../index.php");
+            exit();
+        } else {
+            $this->error = "Invalid username or password";
+        }
+    }
+    
 
     private function checkFieldValues() {
         if(empty($this->username)  || empty($this->password)) {

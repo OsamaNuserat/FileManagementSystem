@@ -2,8 +2,7 @@
 include './login.class.php';
 
 if(isset($_POST['submit'])) {
-
-    $user = new LoginUser($_POST['username'],$_POST['password']);
+$user = new LoginUser($_POST['username'],$_POST['password']);
 }
 
 

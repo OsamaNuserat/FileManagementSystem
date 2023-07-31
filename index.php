@@ -82,6 +82,7 @@ if (isset($_POST["create"])) {
 
 
   // delete a file
+ function deletefile() {
 $dir = "assets/user_folders" . '/' . $_SESSION['email'] . '/';
 $files = glob($dir . '*.{jpg,jpeg,png,pdf}', GLOB_BRACE);
 $files = array_map('basename', $files);
@@ -103,52 +104,63 @@ foreach ($files as $file) {
         break;
     }
 }
+  }
+
+  deletefile();
+
+
+
+
 
 //  delete a folder
-$path = "assets/user_folders" . '/' . $_SESSION['email'] . '/';
-$folders = glob($path . '*', GLOB_ONLYDIR);
-$folders = array_map('basename', $folders);
+function deleteFolderRecursive($folderPath) {
+  if (!is_dir($folderPath)) {
+      echo "Invalid folder path.";
+      return;
+  }
 
+  $files = glob($folderPath . '/*');
+  foreach ($files as $file) {
+      if (is_file($file)) {
+          if (unlink($file)) {
+              // File deleted successfully
+          } else {
+              echo "Error deleting file '$file'.";
+          }
+      } elseif (is_dir($file)) {
+          deleteFolderRecursive($file); // Recursively delete subfolders
+      }
+  }
 
-$queryString = urldecode($_SERVER['QUERY_STRING']);
-
-foreach ($folders as $folder) {
-    
-    $decodedFolderName = urldecode($folder);
-
-    if ($decodedFolderName == $queryString) {
-        $folderPath = $path . $folder;
-
-        $files = glob($folderPath . '/*.{jpg,jpeg,png,pdf}', GLOB_BRACE);
-        $files = array_map('basename', $files);
-
-        
-        foreach ($files as $file) {
-            $filePath = $folderPath . '/' . $file;
-            if (unlink($filePath)) {
-                //
-            } else {
-                echo "Error deleting file '$file'.";
-            }
-        }
-
-        
-        if (rmdir($folderPath)) {
-            echo "Folder '$decodedFolderName' has been deleted successfully.";
-        } else {
-            echo "Error deleting folder '$decodedFolderName'.";
-        }
-        break;
-    }
+  if (rmdir($folderPath)) {
+      echo "Folder has been deleted successfully.";
+  } else {
+      echo "Error deleting folder .";
+  }
 }
 
+function deleteFolder() {
+  $path = "assets/user_folders" . '/' . $_SESSION['email'] . '/';
+  $folders = glob($path . '*', GLOB_ONLYDIR);
+  $folders = array_map('basename', $folders);
+
+  $queryString = urldecode($_SERVER['QUERY_STRING']);
+
+  foreach ($folders as $folder) {
+      $decodedFolderName = urldecode($folder);
+
+      if ($decodedFolderName == $queryString) {
+          $folderPath = $path . $folder;
+
+          deleteFolderRecursive($folderPath);
+          return;
+      }
+  }
 
 
+}
 
-
-
-
-
+deleteFolder();
 
 
 
@@ -336,7 +348,8 @@ foreach ($folders as $folder) {
       </td>
 
       <td>
-      <i class='fa-regular fa-eye text-success border p-1 ' ></i> 
+      <i class='fa-regular fa-eye text-success border p-1 '></i>
+
       <a href=" <?php  echo "?$folder" ?>"><i class='fa-regular fa-trash-can border text-danger p-1' ></i> </a>
       </td>
 
