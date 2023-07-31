@@ -1,7 +1,5 @@
 <?php
 
-
-
 include 'layout/header.php' ;
 
 // uploading a file
