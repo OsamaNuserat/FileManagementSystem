@@ -16,6 +16,7 @@ class  RegisterUser {
     private $storage = "../user.json";
     private $stored_users;
     private $new_user;
+    private $encrypted_password;
 
     // define the constructor
 
